@@ -94,7 +94,7 @@ var Tag = React.createClass({
                 className: this.props.classNames.tag },
             label,
             React.createElement(RemoveComponent, { className: this.props.classNames.remove,
-                onClick: this.props.onDelete })
+                onClick: this.props.onDelete, tag: this.props.tag })
         );
         if (this.props.moveTag) {
             return connectDragSource(connectDropTarget(tagComponent));
