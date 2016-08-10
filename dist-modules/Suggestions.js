@@ -35,7 +35,7 @@ var Suggestions = React.createClass({
         }).bind(this));
 
         var minQueryLength = props.minQueryLength || 2;
-        if (suggestions.length === 0 || props.query.length < minQueryLength) {
+        if (!props.renderAllSuggestions && (suggestions.length === 0 || props.query.length < minQueryLength)) {
             return React.createElement("div", { className: this.props.classNames.suggestions });
         }
 

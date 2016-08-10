@@ -1,6 +1,6 @@
 // Set up test data
 var Countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas"
-      ,"Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands"
+      ,"Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina", "Bosnia Herzegovina", "Botswana","Brazil","British Virgin Islands"
       ,"Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica"
       ,"Cote D Ivoire","Croatia","Cruise Ship","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea"
       ,"Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana"
@@ -55,6 +55,18 @@ var App = React.createClass({
         // re-render
         this.setState({ tags: tags });
     },
+    handleFilterSuggestions: function (query, suggestions) {
+        var filteredSuggestions = suggestions.filter(function(sugg) {
+            var names = sugg.split(' ');
+            query = query.toLowerCase();
+            if (names.length == 2) {
+                return names[0].toLowerCase().startsWith(query) || names[1].toLowerCase().startsWith(query);
+            } else {
+                return names[0].toLowerCase().indexOf(query) === 0;
+            }
+        });
+        return filteredSuggestions;
+    },
     render: function() {
         var tags = this.state.tags;
         var suggestions = this.state.suggestions;
@@ -65,6 +77,8 @@ var App = React.createClass({
                     handleDelete={this.handleDelete}
                     handleAddition={this.handleAddition}
                     handleDrag={this.handleDrag}
+                    showAllSuggestionsOnClick={true}
+                    handleFilterSuggestions={this.handleFilterSuggestions}
                     minQueryLength={2} />
                 <hr />
                 <pre>

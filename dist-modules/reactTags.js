@@ -45,6 +45,8 @@ var ReactTags = React.createClass({
         handleDelete: React.PropTypes.func.isRequired,
         handleAddition: React.PropTypes.func.isRequired,
         handleDrag: React.PropTypes.func,
+        handleFilterSuggestions: React.PropTypes.func,
+        showAllSuggestionsOnClick: React.PropTypes.bool,
         allowDeleteFromEmptyInput: React.PropTypes.bool,
         handleInputChange: React.PropTypes.func,
         minQueryLength: React.PropTypes.number,
@@ -86,6 +88,10 @@ var ReactTags = React.createClass({
         };
     },
     filteredSuggestions: function filteredSuggestions(query, suggestions) {
+        if (this.props.handleFilterSuggestions) {
+            return this.props.handleFilterSuggestions(query, suggestions);
+        }
+
         return suggestions.filter(function (item) {
             return item.toLowerCase().indexOf(query.toLowerCase()) === 0;
         });
@@ -103,6 +109,11 @@ var ReactTags = React.createClass({
         this.setState({ query: "" });
     },
     handleChange: function handleChange(e) {
+
+        this.setState({
+            renderAllSuggestions: false
+        });
+
         if (this.props.handleInputChange) {
             this.props.handleInputChange(e.target.value.trim());
         }
@@ -114,6 +125,22 @@ var ReactTags = React.createClass({
             query: query,
             suggestions: suggestions
         });
+    },
+    handleClick: function handleClick() {
+        var query = this.state.query;
+
+        this.setState({
+            renderAllSuggestions: false
+        });
+        if (this.props.showAllSuggestionsOnClick) {
+            //if click in empty tag field, show all suggestions
+            if (query === "") {
+                this.setState({
+                    renderAllSuggestions: true,
+                    suggestions: this.props.suggestions
+                });
+            }
+        }
     },
     handleKeyDown: function handleKeyDown(e) {
         var _state = this.state;
@@ -127,7 +154,8 @@ var ReactTags = React.createClass({
             this.setState({
                 selectedIndex: -1,
                 selectionMode: false,
-                suggestions: []
+                suggestions: [],
+                renderAllSuggestions: false
             });
         }
 
@@ -181,6 +209,10 @@ var ReactTags = React.createClass({
     },
     addTag: function addTag(tag) {
         var input = this.refs.input;
+
+        this.setState({
+            renderAllSuggestions: false
+        });
 
         if (this.props.autocomplete) {
             var possibleMatches = this.filteredSuggestions(tag, this.props.suggestions);
@@ -248,7 +280,8 @@ var ReactTags = React.createClass({
         var query = this.state.query.trim(),
             selectedIndex = this.state.selectedIndex,
             suggestions = this.state.suggestions,
-            placeholder = this.props.placeholder;
+            placeholder = this.props.placeholder,
+            renderAllSuggestions = this.state.renderAllSuggestions;
 
         var tagInput = !this.props.readOnly ? React.createElement(
             'div',
@@ -258,9 +291,11 @@ var ReactTags = React.createClass({
                 placeholder: placeholder,
                 'aria-label': placeholder,
                 onChange: this.handleChange,
-                onKeyDown: this.handleKeyDown }),
+                onKeyDown: this.handleKeyDown,
+                onClick: this.handleClick }),
             React.createElement(Suggestions, { query: query,
                 suggestions: suggestions,
+                renderAllSuggestions: renderAllSuggestions,
                 selectedIndex: selectedIndex,
                 handleClick: this.handleSuggestionClick,
                 handleHover: this.handleSuggestionHover,
